@@ -46,7 +46,7 @@ date | countMap
  
 After populating both map, a clean up work is done to set any indirect referral to its root referral. 
 
-After the clean up, while printing the result, each countMap will be consolidated using the refined `userMap` to do lookup, indirect referral is replaced by direct referral. 
+After the clean up, while printing the result, each `countMap` will be consolidated using the refined `userMap` to do lookup, indirect referral is replaced by direct referral. 
 
 
 
