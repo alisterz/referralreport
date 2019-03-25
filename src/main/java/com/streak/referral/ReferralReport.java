@@ -22,7 +22,7 @@ public class ReferralReport {
             if (hasReferredBy(referral)) {
                 cleanUpQueue.add(referral.getName());
             }
-            addReferralToReportMap(referral);
+            addReferralToReportCountMap(referral);
         }
 
         for (String name : cleanUpQueue) {
@@ -45,7 +45,7 @@ public class ReferralReport {
         }
     }
 
-    private void addReferralToReportMap(Referral referral) {
+    private void addReferralToReportCountMap(Referral referral) {
         String date = getClosingDateByMonth(referral);
 
         if (!countPerMonthPerUserMap.containsKey(date)) {
