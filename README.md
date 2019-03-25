@@ -26,7 +26,7 @@
 
 ### Algorithm
 The way i took is to use 2 maps.
-User Map and Monthly Count Map per Use
+User Map and Monthly Count Map (Per Month Per User)
 
 ***User Map***
 
@@ -45,6 +45,7 @@ date | countMap
  ---    | Initech:1
  
 After populating both map, a clean up work is done to set any indirect referral to its root referral. 
+
 After the clean up, while printing the result, each countMap will be consolidated, indirect referral is replaced by direct referral. 
 
 
