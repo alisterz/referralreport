@@ -13,7 +13,7 @@ public class ReferralReport {
     private List<String> cleanUpQueue = new ArrayList<>();
 
     public void printReport(List<Referral> referrals) {
-        if (referrals == null || referrals.size() == 0) {
+        if (referrals == null || referrals.isEmpty()) {
             System.out.println("No Referral Data");
         }
 
@@ -33,7 +33,7 @@ public class ReferralReport {
 
     private void printCountMap() {
         for (Map.Entry<String, Map<String, Integer>> keyset : countPerMonthPerUserMap.entrySet()) {
-            if (keyset.getValue().size() == 0) {
+            if (keyset.getValue().isEmpty()) {
                 continue;
             }
             System.out.println(keyset.getKey());
@@ -54,8 +54,8 @@ public class ReferralReport {
 
         Map<String, Integer> countMap = countPerMonthPerUserMap.get(date);
 
-        if (referral.getReferredBy() != null && !countMap.containsKey(referral.getReferredBy())) {
-            countMap.put(referral.getReferredBy(), new Integer(0));
+        if (hasReferredBy(referral) && !countMap.containsKey(referral.getReferredBy())) {
+            countMap.put(referral.getReferredBy(), 0);
         }
         countMap.computeIfPresent(referral.getReferredBy(), (k, v) -> v + 1);
     }
