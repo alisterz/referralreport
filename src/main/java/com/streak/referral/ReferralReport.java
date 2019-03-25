@@ -8,18 +8,19 @@ import java.util.Map;
 public class ReferralReport {
 
     private Map<String, String> userMap = new HashMap<>();
-    private Map<String, Map<String, Integer>> countPerMonthPerUserMap = new HashMap<>();
+    private Map<String, Map<String, Integer>> perMonthPerUseCountMap = new HashMap<>();
 
     private List<String> cleanUpQueue = new ArrayList<>();
 
     public void printReport(List<Referral> referrals) {
         if (referrals == null || referrals.isEmpty()) {
             System.out.println("No Referral Data");
+            return;
         }
 
         for (Referral referral : referrals) {
             userMap.put(referral.getName(), referral.getReferredBy());
-            if (hasReferredBy(referral)) {
+            if (hasReferredBy(referral.getReferredBy())) {
                 cleanUpQueue.add(referral.getName());
             }
             addReferralToReportCountMap(referral);
@@ -32,7 +33,7 @@ public class ReferralReport {
     }
 
     private void printCountMap() {
-        for (Map.Entry<String, Map<String, Integer>> keyset : countPerMonthPerUserMap.entrySet()) {
+        for (Map.Entry<String, Map<String, Integer>> keyset : perMonthPerUseCountMap.entrySet()) {
             if (keyset.getValue().isEmpty()) {
                 continue;
             }
@@ -48,36 +49,40 @@ public class ReferralReport {
     private void addReferralToReportCountMap(Referral referral) {
         String date = getClosingDateByMonth(referral);
 
-        if (!countPerMonthPerUserMap.containsKey(date)) {
-            countPerMonthPerUserMap.put(date, new HashMap<>());
+        if (!perMonthPerUseCountMap.containsKey(date)) {
+            perMonthPerUseCountMap.put(date, new HashMap<>());
         }
 
-        Map<String, Integer> countMap = countPerMonthPerUserMap.get(date);
+        Map<String, Integer> countMap = perMonthPerUseCountMap.get(date);
 
-        if (hasReferredBy(referral) && !countMap.containsKey(referral.getReferredBy())) {
+        if (hasReferredBy(referral.getReferredBy()) && !countMap.containsKey(referral.getReferredBy())) {
             countMap.put(referral.getReferredBy(), 0);
         }
         countMap.computeIfPresent(referral.getReferredBy(), (k, v) -> v + 1);
     }
 
     private Map<String, Integer> consolidateCountByRootReferral(Map<String, Integer> map) {
+
+        Map<String, Integer> consolidateMap = new HashMap<>();
+
         for (Map.Entry<String, Integer> kvp : map.entrySet()) {
             String rootReferral = userMap.get(kvp.getKey());
             if (rootReferral == null) {
+                consolidateMap.put(kvp.getKey(), kvp.getValue());
                 continue;
             }
-            if (map.containsKey(rootReferral)) {
-                map.computeIfPresent(rootReferral, (k, v) -> v + 1);
+            if (consolidateMap.containsKey(rootReferral)) {
+                consolidateMap.computeIfPresent(rootReferral, (k, v) -> v + 1);
             } else {
-                map.put(rootReferral, kvp.getValue());
+                consolidateMap.put(rootReferral, kvp.getValue());
             }
-            map.remove(kvp.getKey());
         }
-        return map;
+        
+        return consolidateMap;
     }
 
-    private boolean hasReferredBy(Referral referral) {
-        return referral.getReferredBy() != null && !referral.getReferredBy().isEmpty();
+    private boolean hasReferredBy(String referredByName) {
+        return referredByName != null && !referredByName.isEmpty();
     }
 
     private String getClosingDateByMonth(Referral referral) {
@@ -85,7 +90,7 @@ public class ReferralReport {
     }
 
     private String findAndSetRootReferral(String name) {
-        if (userMap.get(name) == null || userMap.get(name).isEmpty()) {
+        if (!hasReferredBy(userMap.get(name))) {
             return name;
         }
         String root = findAndSetRootReferral(userMap.get(name));
